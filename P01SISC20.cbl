@@ -32,7 +32,7 @@
 
       *>----Variáveis de arquivos
        file section.
-       fd arq-usuarios occurs 100.
+       fd arq-usuarios.
        01 fl-login-usuario.
            05 fl-user                                  pic x(10).
            05 fl-password                              pic x(08).
@@ -59,13 +59,43 @@
                88 ws-fs-senha-nao-ok                   value 0.
                88 ws-fs-user-nao-ok                    value 1.
 
+       01 ws-msn-erro.
+                 05 ws-msn-erro-ofsset                    pic 9(04).
+                 05 filler                                pic x(01) value "-".
+                 05 ws-msn-erro-cod                       pic x(02).
+                 05 filler                                pic x(01) value space.
+                 05 ws-msn-erro-text                      pic x(42).
 
-      *>----Variáveis para comunicação entre programas
-       linkage section.
-
-
-      *>----Declaração de tela
        screen section.
+       01  tela-menu.
+      *>                                0    1    1    2    2    3    3    4    4    5    5    6    6    7    7    8
+      *>                                5    0    5    0    5    0    5    0    5    0    5    0    5    0    5    0
+      *>                            ----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+           05 blank screen.
+           05 line 02 col 01 value "                                Tipo de Usuario                                  ".
+           05 line 03 col 01 value "      MENU                                                                       ".
+           05 line 04 col 01 value "        [ ]Funcionario                                                           ".
+           05 line 05 col 01 value "        [ ]Administrador                                                         ".
+
+
+      *>                                0    1    1    2    2    3    3    4    4    5    5    6    6    7    7    8
+      *>                                5    0    5    0    5    0    5    0    5    0    5    0    5    0    5    0
+      *>                            ----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+       01 sc-tela.
+           05 blank screen.
+           05 line 01 col 01 value "                           Autenticacao de senha                               "
+           foreground-color 12.
+           05 line 03 col 01 value "                   **************************************                      ".
+           05 line 04 col 01 value "                   **************************************                      ".
+           05 line 05 col 01 value "                   **  USER ID :                       **                      ".
+           05 line 06 col 01 value "                   **                                  **                      ".
+           05 line 07 col 01 value "                   **  PASSWORD:                       **                      ".
+           05 line 08 col 01 value "                   **                                  **                      ".
+           05 line 09 col 01 value "                   **                                  **                      ".
+           05 line 10 col 01 value "                   **                                  **                      ".
+           05 line 11 col 01 value "                   **************************************                      ".
+           05 line 12 col 01 value "                   **************************************                      ".
+
 
       *>Declaração do corpo do programa
        procedure division.
@@ -79,15 +109,18 @@
            exit.
 
        1000-inicializa section.
+         open i-o arq-usuarios                 *> open i-o abre o arquivo para leitura e escrita
+                    if ws-fs-arq-usuarios    <> "00"
+                    and ws-fs-arq-usuarios   <> "05" then
+                        move 1                                   to ws-msn-erro-ofsset
+                        move ws-fs-arq-usuarios                  to ws-msn-erro-cod
+                        move "Erro ao abrir arq.usuarios"        to ws-msn-erro-text
+                        perform finaliza-anormal
 
-
-
-
-
-           .
-       1000-inicializa-exit.
-           exit.
-
+                    end-if
+                    .
+           1000-inicializa-exit.
+               exit.
 
        2000-processamento section.
 
